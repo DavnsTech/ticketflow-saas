@@ -13,8 +13,15 @@ Open source self-hosted helpdesk ticketing system for B2B.
 ### Ticket Detail
 ![Ticket Detail](docs/screenshots/ticket-detail.png)
 
+### Client Support Portal
+![Client Portal](docs/screenshots/client-portal.png)
+
+### Guided Ticket Creation
+![Ticket Wizard](docs/screenshots/ticket-wizard.png)
+
 ## Features
 
+- Client support portal with category selection and guided ticket creation
 - Ticket management with status, priority, categories, and tags
 - Role-based access (Admin, Agent, User)
 - Dashboard with KPI stats and agent workload

@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ticketflow}
+      POSTGRES_USER: ${DB_USER:-ticketflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ticketflow}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-ticketflow}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-ticketflow}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-ticketflow}
+      SPRING_PROFILES_ACTIVE: prod
+      TICKETFLOW_JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-a-long-random-string-at-least-64-chars}
+      TICKETFLOW_EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+      SPRING_MAIL_HOST: ${SMTP_HOST:-localhost}
+      SPRING_MAIL_PORT: ${SMTP_PORT:-587}
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${APP_PORT:-80}:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:

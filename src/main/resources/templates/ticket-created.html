@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h2>Ticket Created</h2>
+<p>Your ticket <strong>#<span th:text="${ticket.id}"></span></strong> has been created.</p>
+<p><strong>Title:</strong> <span th:text="${ticket.title}"></span></p>
+<p><strong>Priority:</strong> <span th:text="${ticket.priority}"></span></p>
+<p>We will get back to you shortly.</p>
+</body>
+</html>

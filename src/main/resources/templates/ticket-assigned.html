@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h2>Ticket Assigned</h2>
+<p>Ticket <strong>#<span th:text="${ticket.id}"></span></strong> has been assigned to you.</p>
+<p><strong>Title:</strong> <span th:text="${ticket.title}"></span></p>
+<p><strong>Priority:</strong> <span th:text="${ticket.priority}"></span></p>
+<p><strong>Status:</strong> <span th:text="${ticket.status}"></span></p>
+</body>
+</html>

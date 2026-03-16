@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h2>New Comment</h2>
+<p>A new comment was added to ticket <strong>#<span th:text="${ticket.id}"></span></strong>.</p>
+<p><strong>Title:</strong> <span th:text="${ticket.title}"></span></p>
+<p><strong>Comment:</strong></p>
+<blockquote th:text="${comment.content}"></blockquote>
+<p><strong>By:</strong> <span th:text="${comment.author.displayName}"></span></p>
+</body>
+</html>

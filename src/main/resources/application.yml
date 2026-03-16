@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: ticketflow
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketflow
+    username: ticketflow
+    password: ticketflow
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+
+server:
+  port: 8080
+
+ticketflow:
+  jwt:
+    secret: change-me-in-production-use-a-long-random-string-at-least-64-chars
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
+  email:
+    enabled: false
+    from: noreply@ticketflow.local
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: true
+
+ticketflow:
+  email:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    show-sql: false
+
+ticketflow:
+  email:
+    enabled: true

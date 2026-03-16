@@ -13,6 +13,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function DefaultRedirect() {
+  const { user } = useAuth();
+  const target = user?.role === "USER" ? "/tickets" : "/dashboard";
+  return <Navigate to={target} replace />;
+}
+
+function StaffOnly({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (user?.role === "USER") return <Navigate to="/tickets" replace />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -25,11 +37,11 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route index element={<DefaultRedirect />} />
+        <Route path="dashboard" element={<StaffOnly><DashboardPage /></StaffOnly>} />
         <Route path="tickets" element={<TicketListPage />} />
         <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
-        <Route path="team" element={<TeamPage />} />
+        <Route path="team" element={<StaffOnly><TeamPage /></StaffOnly>} />
       </Route>
     </Routes>
   );

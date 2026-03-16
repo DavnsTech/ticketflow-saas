@@ -4,12 +4,6 @@ import { useTheme } from "../contexts/ThemeContext";
 import { getInitials } from "../utils";
 import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap } from "lucide-react";
 
-const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/tickets", label: "Tickets", icon: Ticket },
-  { to: "/team", label: "Team", icon: Users },
-];
-
 function NavLink({ to, label, icon: Icon, active }: { to: string; label: string; icon: typeof LayoutDashboard; active: boolean }) {
   return (
     <Link
@@ -32,6 +26,15 @@ export default function Layout() {
   const location = useLocation();
 
   const initials = user?.displayName ? getInitials(user.displayName) : "";
+  const isClient = user?.role === "USER";
+
+  const navItems = isClient
+    ? [{ to: "/tickets", label: "My Tickets", icon: Ticket }]
+    : [
+        { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+        { to: "/tickets", label: "Tickets", icon: Ticket },
+        { to: "/team", label: "Team", icon: Users },
+      ];
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-zinc-950">

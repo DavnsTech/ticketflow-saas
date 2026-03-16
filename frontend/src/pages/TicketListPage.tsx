@@ -1,12 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { listTickets } from "../api/tickets";
 import type { TicketResponse } from "../api/tickets";
+import { useAuth } from "../contexts/AuthContext";
 import TicketTable from "../components/TicketTable";
 import TicketFilters from "../components/TicketFilters";
 import TicketForm from "../components/TicketForm";
 import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function TicketListPage() {
+  const { user } = useAuth();
   const [tickets, setTickets] = useState<TicketResponse[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
@@ -18,6 +20,8 @@ export default function TicketListPage() {
   const [direction, setDirection] = useState("DESC");
   const [showForm, setShowForm] = useState(false);
   const [error, setError] = useState("");
+
+  const isClient = user?.role === "USER";
 
   const loadTickets = useCallback(async () => {
     try {
@@ -58,12 +62,16 @@ export default function TicketListPage() {
       {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Tickets</h2>
-          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{totalElements} total tickets</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">
+            {isClient ? "My Tickets" : "Tickets"}
+          </h2>
+          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
+            {totalElements} {isClient ? "ticket" : "total ticket"}{totalElements !== 1 ? "s" : ""}
+          </p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
           <Plus size={16} />
-          New Ticket
+          {isClient ? "New Request" : "New Ticket"}
         </button>
       </div>
 

@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { getInitials } from "../utils";
-import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap, LifeBuoy } from "lucide-react";
 
 function NavLink({ to, label, icon: Icon, active }: { to: string; label: string; icon: typeof LayoutDashboard; active: boolean }) {
   return (
@@ -29,7 +29,9 @@ export default function Layout() {
   const isClient = user?.role === "USER";
 
   const navItems = isClient
-    ? [{ to: "/tickets", label: "My Tickets", icon: Ticket }]
+    ? [
+        { to: "/portal", label: "Support", icon: LifeBuoy },
+      ]
     : [
         { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { to: "/tickets", label: "Tickets", icon: Ticket },

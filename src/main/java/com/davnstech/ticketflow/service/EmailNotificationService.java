@@ -1,5 +1,6 @@
 package com.davnstech.ticketflow.service;
 
+import com.davnstech.ticketflow.domain.Invitation;
 import com.davnstech.ticketflow.domain.Ticket;
 import com.davnstech.ticketflow.domain.TicketComment;
 import com.davnstech.ticketflow.domain.User;
@@ -88,6 +89,18 @@ public class EmailNotificationService {
         context.setVariable("token", user.getResetToken());
         String body = templateEngine.process("password-reset", context);
         sendEmail(user.getEmail(), "Reset your password — TicketFlow", body);
+    }
+
+    @Async
+    public void sendInvitationEmail(Invitation invitation) {
+        if (!enabled) return;
+
+        Context context = new Context();
+        context.setVariable("email", invitation.getEmail());
+        context.setVariable("role", invitation.getRole().name());
+        context.setVariable("token", invitation.getToken());
+        String body = templateEngine.process("invitation", context);
+        sendEmail(invitation.getEmail(), "You're invited to join TicketFlow", body);
     }
 
     private void sendEmail(String to, String subject, String htmlBody) {

@@ -10,5 +10,6 @@ public record RegisterRequest(
         @NotBlank String displayName,
         String website,
         String captchaToken,
-        Integer captchaAngle) {
+        Integer captchaAngle,
+        String inviteToken) {
 }

@@ -34,6 +34,7 @@ ticketflow:
     enabled: false
     from: noreply@ticketflow.local
   security:
+    public-registration: false
     login-rate-limit: 10
     register-rate-limit: 5
     forgot-password-rate-limit: 3

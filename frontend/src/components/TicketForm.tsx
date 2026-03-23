@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createTicket, updateTicket } from "../api/tickets";
 import type { TicketResponse } from "../api/tickets";
+import { listCategories } from "../api/categories";
+import type { CategoryResponse } from "../api/categories";
 import { X } from "lucide-react";
 
 interface TicketFormProps {
@@ -13,17 +15,28 @@ export default function TicketForm({ ticket, onClose, onSaved }: TicketFormProps
   const [title, setTitle] = useState(ticket?.title ?? "");
   const [description, setDescription] = useState(ticket?.description ?? "");
   const [priority, setPriority] = useState(ticket?.priority ?? "MEDIUM");
-  const [category, setCategory] = useState(ticket?.category ?? "");
+  const [categoryId, setCategoryId] = useState<string>(ticket?.categoryId?.toString() ?? "");
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [tagInput, setTagInput] = useState(ticket?.tags.join(", ") ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const isEdit = !!ticket;
 
+  useEffect(() => {
+    listCategories()
+      .then((response) => setCategories(response.data))
+      .catch(() => setCategories([]));
+  }, []);
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!title.trim()) {
       setError("Title is required");
+      return;
+    }
+    if (!categoryId) {
+      setError("Category is required");
       return;
     }
 
@@ -34,9 +47,9 @@ export default function TicketForm({ ticket, onClose, onSaved }: TicketFormProps
 
     try {
       if (isEdit) {
-        await updateTicket(ticket.id, { title, description, priority, category: category || null, tags });
+        await updateTicket(ticket.id, { title, description, priority, categoryId: Number(categoryId), tags });
       } else {
-        await createTicket({ title, description, priority, category: category || undefined, tags });
+        await createTicket({ title, description, priority, categoryId: Number(categoryId), tags });
       }
       onSaved();
     } catch {
@@ -87,7 +100,12 @@ export default function TicketForm({ ticket, onClose, onSaved }: TicketFormProps
             </div>
             <div>
               <label className="label">Category</label>
-              <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Billing" className="input-field" />
+              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input-field">
+                <option value="">Select category</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             </div>
           </div>
 

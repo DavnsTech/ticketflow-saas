@@ -7,11 +7,14 @@ export interface TicketResponse {
   status: string;
   priority: string;
   category: string | null;
+  categoryId: number | null;
+  categoryColor: string | null;
   requesterName: string;
   requesterId: number;
   assigneeName: string | null;
   assigneeId: number | null;
   tags: string[];
+  customFields: Record<string, string>;
   createdAt: string;
   updatedAt: string;
   resolvedAt: string | null;
@@ -37,6 +40,7 @@ export interface TicketFilters {
   status?: string;
   priority?: string;
   assigneeId?: number;
+  categoryId?: number;
   page?: number;
   size?: number;
   sortBy?: string;
@@ -51,7 +55,14 @@ export function getTicket(ticketId: number) {
   return client.get<TicketResponse>(`/tickets/${ticketId}`);
 }
 
-export function createTicket(data: { title: string; description?: string; priority?: string; category?: string; tags?: string[] }) {
+export function createTicket(data: {
+  title: string;
+  description?: string;
+  priority?: string;
+  categoryId: number;
+  tags?: string[];
+  customFieldValues?: Record<number, string>;
+}) {
   return client.post<TicketResponse>("/tickets", data);
 }
 

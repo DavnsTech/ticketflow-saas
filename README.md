@@ -7,29 +7,66 @@ Open source self-hosted helpdesk ticketing system for B2B.
 ### Dashboard
 ![Dashboard](docs/screenshots/dashboard.png)
 
-### Ticket List
+### Support Center (Client View)
+![Support Center](docs/screenshots/support-center.png)
+
+### Ticket List (Staff View)
 ![Tickets](docs/screenshots/tickets.png)
 
 ### Ticket Detail
 ![Ticket Detail](docs/screenshots/ticket-detail.png)
 
-### Client Support Portal
-![Client Portal](docs/screenshots/client-portal.png)
-
-### Guided Ticket Creation
+### Guided Request Creation
 ![Ticket Wizard](docs/screenshots/ticket-wizard.png)
+
+### Dynamic Custom Fields
+![Custom Fields](docs/screenshots/ticket-wizard-fields.png)
+
+### Category Settings (Admin)
+![Settings](docs/screenshots/settings.png)
+
+### Team & Invitations
+![Team](docs/screenshots/team.png)
+
+### Login with Puzzle Captcha
+![Login](docs/screenshots/login.png)
 
 ## Features
 
-- Client support portal with category selection and guided ticket creation
-- Ticket management with status, priority, categories, and tags
-- Role-based access (Admin, Agent, User)
-- Dashboard with KPI stats and agent workload
-- Comment system with internal notes for agents
-- Team management with role assignment
+### Service Desk
+- Support center for clients with category-based request submission
+- Dynamic custom fields per category (text, URL, select, number)
+- Guided multi-step request creation wizard
+- Client view focused on "My Requests" with status tracking
+- Staff ticket management with filtering, sorting, and assignment
+
+### Administration
+- Custom categories with colors, icons, and descriptions
+- Custom fields per category (required or optional)
+- Agent-to-category assignment — agents only see their categories
+- Team management with role assignment (Admin, Agent, User)
+- Dashboard with KPI stats, priority breakdown, and agent workload
+
+### Security
+- **Honeypot** — Hidden field on all auth forms, silent rejection on bot fill
+- **Rate limiting (IP)** — Login: 10/min, Register: 5/hour, Forgot password: 3/hour
+- **Rate limiting (email)** — Max 3 verification/reset emails per hour per address
+- **Puzzle captcha** — Local image rotation challenge, HMAC-signed token, 5 min validity
+- **IP account limit** — Max 3 accounts created per day per IP
+- **Email verification** — Required when SMTP is configured, auto-verified otherwise
+- **Password reset** — Token-based flow with 1 hour expiry
+
+### Registration
+
+Two modes, configurable via `ticketflow.security.public-registration`:
+
+- **Public registration** (`true`) — Anyone can create an account from the login page. All security protections apply (captcha, honeypot, rate limit, IP limit, email verification).
+- **Invitation only** (`false`, default) — Admins generate invite links from the Team page. Invited users register via a unique link with pre-assigned role. Links expire after 7 days and can be revoked.
+
+### General
 - Dark / Light mode
-- Email notifications (SMTP)
-- JWT authentication with refresh tokens
+- Email notifications (SMTP) with Thymeleaf templates
+- JWT authentication with access + refresh tokens
 - RESTful API
 - Docker Compose deployment
 
@@ -80,26 +117,66 @@ Backend runs on `http://localhost:8080`, frontend on `http://localhost:5173`.
 | `SMTP_HOST` | localhost | SMTP server host |
 | `SMTP_PORT` | 587 | SMTP server port |
 | `APP_PORT` | 80 | Public app port |
+| `PUBLIC_REGISTRATION` | false | Allow public account creation |
 
 ## Demo Accounts
 
 | Email | Password | Role |
 |---|---|---|
 | admin@ticketflow.local | password123 | Admin |
-| agent1@ticketflow.local | password123 | Agent |
+| agent1@ticketflow.local | password123 | Agent (Auth, API) |
+| agent2@ticketflow.local | password123 | Agent (Billing, UI) |
 | user1@ticketflow.local | password123 | User |
+
+## Default Categories
+
+| Category | Description | Custom Fields |
+|---|---|---|
+| Billing | Invoices, payments and subscriptions | Invoice Number |
+| Authentication | Login, SSO and access issues | Affected URL (required), Browser |
+| API | API integration and endpoints | Endpoint (required), HTTP Method |
+| UI | Interface and display issues | Page URL, Device |
+| Feature Request | New features and improvements | — |
+| General | Other questions and support | — |
 
 ## API Endpoints
 
 ### Auth
-- `POST /api/auth/login` — Login
-- `POST /api/auth/register` — Register (admin only)
+- `GET /api/auth/config` — Public registration and email status
+- `POST /api/auth/login` — Login (honeypot + captcha)
+- `POST /api/auth/register` — Register (public, invite, or admin)
 - `POST /api/auth/refresh` — Refresh token
+- `POST /api/auth/forgot-password` — Request password reset (honeypot + captcha)
+- `POST /api/auth/reset-password` — Reset password with token
+- `GET /api/auth/verify-email?token=` — Verify email address
+- `GET /api/auth/invite/validate?token=` — Validate invitation token
+- `GET /api/captcha` — Generate puzzle captcha challenge
+
+### Invitations (admin only)
+- `POST /api/invitations` — Create invitation (email + role)
+- `GET /api/invitations` — List pending invitations
+- `DELETE /api/invitations/{id}` — Revoke invitation
+
+### Categories
+- `GET /api/categories` — List active categories
+- `GET /api/categories/{id}/fields` — List custom fields for category
+
+### Categories Admin
+- `GET /api/admin/categories` — List all categories
+- `POST /api/admin/categories` — Create category
+- `PUT /api/admin/categories/{id}` — Update category
+- `PUT /api/admin/categories/{id}/toggle` — Toggle active
+- `PUT /api/admin/categories/{id}/agents` — Assign agents
+- `GET /api/admin/categories/{id}/fields` — List all fields
+- `POST /api/admin/categories/{id}/fields` — Create field
+- `PUT /api/admin/custom-fields/{id}` — Update field
+- `PUT /api/admin/custom-fields/{id}/toggle` — Toggle field active
+- `DELETE /api/admin/custom-fields/{id}` — Delete field
 
 ### Tickets
-- `GET /api/tickets` — List (filters: status, priority, assigneeId, page, sortBy)
-- `POST /api/tickets` — Create
-- `GET /api/tickets/{id}` — Detail
+- `GET /api/tickets` — List (filters: status, priority, assigneeId, categoryId)
+- `POST /api/tickets` — Create (with categoryId + customFieldValues)
+- `GET /api/tickets/{id}` — Detail (includes custom field values)
 - `PUT /api/tickets/{id}` — Update
 - `DELETE /api/tickets/{id}` — Delete (admin only)
 

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
@@ -39,15 +40,20 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         SELECT t FROM Ticket t
         JOIN FETCH t.requester
         LEFT JOIN FETCH t.assignee
+        LEFT JOIN FETCH t.categoryEntity
         WHERE (:status IS NULL OR t.status = :status)
         AND (:priority IS NULL OR t.priority = :priority)
         AND (:assigneeId IS NULL OR t.assignee.id = :assigneeId)
         AND (:requesterId IS NULL OR t.requester.id = :requesterId)
+        AND (:categoryId IS NULL OR t.categoryEntity.id = :categoryId)
+        AND (:agentCategoryIds IS NULL OR t.categoryEntity.id IN :agentCategoryIds)
     """)
     Page<Ticket> findWithFilters(
             @Param("status") TicketStatus status,
             @Param("priority") TicketPriority priority,
             @Param("assigneeId") Long assigneeId,
             @Param("requesterId") Long requesterId,
+            @Param("categoryId") Long categoryId,
+            @Param("agentCategoryIds") List<Long> agentCategoryIds,
             Pageable pageable);
 }

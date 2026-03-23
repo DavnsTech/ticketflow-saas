@@ -38,13 +38,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/login",
+                                "/api/auth/register",
                                 "/api/auth/refresh",
                                 "/api/auth/forgot-password",
                                 "/api/auth/reset-password",
                                 "/api/auth/verify-email",
+                                "/api/auth/config",
+                                "/api/auth/invite/validate",
                                 "/api/captcha"
                         ).permitAll()
-                        .requestMatchers("/api/auth/register").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

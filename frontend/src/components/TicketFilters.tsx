@@ -1,18 +1,40 @@
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
+import { listCategories } from "../api/categories";
+import type { CategoryResponse } from "../api/categories";
 
 interface TicketFiltersProps {
   status: string;
   priority: string;
   search: string;
+  categoryId: string;
   onStatusChange: (value: string) => void;
   onPriorityChange: (value: string) => void;
   onSearchChange: (value: string) => void;
+  onCategoryChange: (value: string) => void;
 }
 
 const statuses = ["", "OPEN", "IN_PROGRESS", "WAITING", "RESOLVED", "CLOSED"];
 const priorities = ["", "LOW", "MEDIUM", "HIGH", "URGENT"];
 
-export default function TicketFilters({ status, priority, search, onStatusChange, onPriorityChange, onSearchChange }: TicketFiltersProps) {
+export default function TicketFilters({
+  status,
+  priority,
+  search,
+  categoryId,
+  onStatusChange,
+  onPriorityChange,
+  onSearchChange,
+  onCategoryChange,
+}: TicketFiltersProps) {
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
+
+  useEffect(() => {
+    listCategories()
+      .then((response) => setCategories(response.data))
+      .catch(() => setCategories([]));
+  }, []);
+
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="relative flex-1 min-w-[200px] max-w-xs">
@@ -45,6 +67,17 @@ export default function TicketFilters({ status, priority, search, onStatusChange
         <option value="">All Priorities</option>
         {priorities.filter(Boolean).map((p) => (
           <option key={p} value={p}>{p}</option>
+        ))}
+      </select>
+
+      <select
+        value={categoryId}
+        onChange={(event) => onCategoryChange(event.target.value)}
+        className="input-field w-auto min-w-[140px]"
+      >
+        <option value="">All Categories</option>
+        {categories.map((c) => (
+          <option key={c.id} value={c.id}>{c.name}</option>
         ))}
       </select>
     </div>

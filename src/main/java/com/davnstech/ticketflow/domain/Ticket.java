@@ -32,6 +32,10 @@ public class Ticket {
     private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category categoryEntity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
@@ -42,6 +46,9 @@ public class Ticket {
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("createdAt ASC")
     private List<TicketComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketCustomValue> customValues = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "ticket_tags", joinColumns = @JoinColumn(name = "ticket_id"))
@@ -86,6 +93,9 @@ public class Ticket {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
+    public Category getCategoryEntity() { return categoryEntity; }
+    public void setCategoryEntity(Category categoryEntity) { this.categoryEntity = categoryEntity; }
+
     public User getRequester() { return requester; }
     public void setRequester(User requester) { this.requester = requester; }
 
@@ -93,6 +103,8 @@ public class Ticket {
     public void setAssignee(User assignee) { this.assignee = assignee; }
 
     public List<TicketComment> getComments() { return comments; }
+
+    public List<TicketCustomValue> getCustomValues() { return customValues; }
 
     public Set<String> getTags() { return tags; }
     public void setTags(Set<String> tags) { this.tags = tags; }

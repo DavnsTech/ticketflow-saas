@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Zap, Sun, Moon } from "lucide-react";
+import { getAuthConfig } from "../api/auth";
 import HoneypotField from "../components/HoneypotField";
 import PuzzleCaptcha from "../components/PuzzleCaptcha";
 
@@ -17,6 +18,11 @@ export default function LoginPage() {
   const [captchaAngle, setCaptchaAngle] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [publicRegistration, setPublicRegistration] = useState(false);
+
+  useEffect(() => {
+    getAuthConfig().then((res) => setPublicRegistration(res.data.publicRegistration)).catch(() => {});
+  }, []);
 
   const handleCaptchaSolved = useCallback((token: string, angle: number) => {
     setCaptchaToken(token);
@@ -112,6 +118,15 @@ export default function LoginPage() {
               Demo: admin@ticketflow.local / password123
             </span>
           </div>
+
+          {publicRegistration && (
+            <p className="text-xs text-center text-gray-500 dark:text-zinc-400">
+              Don't have an account?{" "}
+              <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+                Create one
+              </Link>
+            </p>
+          )}
         </form>
       </div>
     </div>

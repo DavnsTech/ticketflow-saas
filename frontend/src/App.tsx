@@ -4,11 +4,13 @@ import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import TicketListPage from "./pages/TicketListPage";
 import TicketDetailPage from "./pages/TicketDetailPage";
 import ClientPortalPage from "./pages/ClientPortalPage";
 import TeamPage from "./pages/TeamPage";
+import SettingsPage from "./pages/SettingsPage";
 import Layout from "./components/Layout";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -36,6 +38,7 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route
         path="/"
         element={
@@ -50,6 +53,7 @@ export default function App() {
         <Route path="tickets" element={<StaffOnly><TicketListPage /></StaffOnly>} />
         <Route path="tickets/:ticketId" element={<TicketDetailPage />} />
         <Route path="team" element={<StaffOnly><TeamPage /></StaffOnly>} />
+        <Route path="settings" element={<StaffOnly><SettingsPage /></StaffOnly>} />
       </Route>
     </Routes>
   );

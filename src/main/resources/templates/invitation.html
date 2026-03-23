@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; color: #1a1a2e;">
+  <h2 style="color: #4f46e5; margin-bottom: 24px;">You're invited to TicketFlow</h2>
+  <p>You've been invited to join as <strong th:text="${role}">User</strong>.</p>
+  <p>Click the link below to create your account:</p>
+  <p style="margin: 24px 0;">
+    <a th:href="@{|/register?invite=${token}|}"
+       style="background: #4f46e5; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600;">
+      Accept Invitation
+    </a>
+  </p>
+  <p style="color: #6b7280; font-size: 14px;">This invitation expires in 7 days.</p>
+</body>
+</html>

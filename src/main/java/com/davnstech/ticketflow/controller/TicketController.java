@@ -3,6 +3,7 @@ package com.davnstech.ticketflow.controller;
 import com.davnstech.ticketflow.domain.TicketPriority;
 import com.davnstech.ticketflow.domain.TicketStatus;
 import com.davnstech.ticketflow.dto.*;
+import com.davnstech.ticketflow.service.CategoryService;
 import com.davnstech.ticketflow.service.TicketService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -14,14 +15,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tickets")
 public class TicketController {
 
     private final TicketService ticketService;
+    private final CategoryService categoryService;
 
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, CategoryService categoryService) {
         this.ticketService = ticketService;
+        this.categoryService = categoryService;
     }
 
     @PostMapping
@@ -35,6 +40,7 @@ public class TicketController {
             @RequestParam(required = false) TicketStatus status,
             @RequestParam(required = false) TicketPriority priority,
             @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -43,7 +49,16 @@ public class TicketController {
 
         Long userId = (Long) auth.getPrincipal();
         Long requesterId = hasRole(auth, "ROLE_USER") ? userId : null;
-        var filters = new TicketFilters(status, priority, assigneeId, requesterId);
+
+        List<Long> agentCategoryIds = null;
+        if (hasRole(auth, "ROLE_AGENT")) {
+            agentCategoryIds = categoryService.getCategoryIdsForAgent(userId);
+            if (agentCategoryIds.isEmpty()) {
+                agentCategoryIds = null;
+            }
+        }
+
+        var filters = new TicketFilters(status, priority, assigneeId, requesterId, categoryId, agentCategoryIds);
         var pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
         return ResponseEntity.ok(ticketService.list(filters, pageable));

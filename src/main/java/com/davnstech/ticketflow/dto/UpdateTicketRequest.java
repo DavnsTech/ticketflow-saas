@@ -11,6 +11,6 @@ public record UpdateTicketRequest(
         TicketStatus status,
         TicketPriority priority,
         Long assigneeId,
-        String category,
+        Long categoryId,
         Set<String> tags) {
 }

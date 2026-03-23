@@ -15,6 +15,7 @@ export default function TicketListPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [status, setStatus] = useState("");
   const [priority, setPriority] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [direction, setDirection] = useState("DESC");
@@ -28,6 +29,7 @@ export default function TicketListPage() {
       const response = await listTickets({
         status: status || undefined,
         priority: priority || undefined,
+        categoryId: categoryId ? Number(categoryId) : undefined,
         page,
         sortBy,
         direction,
@@ -38,7 +40,7 @@ export default function TicketListPage() {
     } catch {
       setError("Failed to load tickets");
     }
-  }, [status, priority, page, sortBy, direction]);
+  }, [status, priority, categoryId, page, sortBy, direction]);
 
   useEffect(() => {
     loadTickets();
@@ -79,9 +81,11 @@ export default function TicketListPage() {
         status={status}
         priority={priority}
         search={search}
+        categoryId={categoryId}
         onStatusChange={(value) => { setStatus(value); setPage(0); }}
         onPriorityChange={(value) => { setPriority(value); setPage(0); }}
         onSearchChange={setSearch}
+        onCategoryChange={(value) => { setCategoryId(value); setPage(0); }}
       />
 
       <TicketTable tickets={filteredTickets} sortBy={sortBy} direction={direction} onSort={handleSort} />

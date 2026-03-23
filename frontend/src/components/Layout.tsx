@@ -2,7 +2,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { getInitials } from "../utils";
-import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap, LifeBuoy } from "lucide-react";
+import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap, LifeBuoy, Settings } from "lucide-react";
 
 function NavLink({ to, label, icon: Icon, active }: { to: string; label: string; icon: typeof LayoutDashboard; active: boolean }) {
   return (
@@ -28,6 +28,8 @@ export default function Layout() {
   const initials = user?.displayName ? getInitials(user.displayName) : "";
   const isClient = user?.role === "USER";
 
+  const isAdmin = user?.role === "ADMIN";
+
   const navItems = isClient
     ? [
         { to: "/portal", label: "Support", icon: LifeBuoy },
@@ -36,6 +38,7 @@ export default function Layout() {
         { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
         { to: "/tickets", label: "Tickets", icon: Ticket },
         { to: "/team", label: "Team", icon: Users },
+        ...(isAdmin ? [{ to: "/settings", label: "Settings", icon: Settings }] : []),
       ];
 
   return (

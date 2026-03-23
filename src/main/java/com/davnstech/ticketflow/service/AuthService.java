@@ -1,5 +1,6 @@
 package com.davnstech.ticketflow.service;
 
+import com.davnstech.ticketflow.domain.Invitation;
 import com.davnstech.ticketflow.domain.User;
 import com.davnstech.ticketflow.domain.UserRole;
 import com.davnstech.ticketflow.dto.AuthResponse;
@@ -32,20 +33,34 @@ public class AuthService {
     private final JwtTokenProvider tokenProvider;
     private final RateLimitService rateLimitService;
     private final CaptchaService captchaService;
+    private final InvitationService invitationService;
     private final EmailNotificationService emailService;
     private final boolean emailEnabled;
+    private final boolean publicRegistration;
 
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
                        JwtTokenProvider tokenProvider, RateLimitService rateLimitService,
-                       CaptchaService captchaService, EmailNotificationService emailService,
-                       @Value("${ticketflow.email.enabled}") boolean emailEnabled) {
+                       CaptchaService captchaService, InvitationService invitationService,
+                       EmailNotificationService emailService,
+                       @Value("${ticketflow.email.enabled}") boolean emailEnabled,
+                       @Value("${ticketflow.security.public-registration}") boolean publicRegistration) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.rateLimitService = rateLimitService;
         this.captchaService = captchaService;
+        this.invitationService = invitationService;
         this.emailService = emailService;
         this.emailEnabled = emailEnabled;
+        this.publicRegistration = publicRegistration;
+    }
+
+    public boolean isPublicRegistration() {
+        return publicRegistration;
+    }
+
+    public boolean isEmailEnabled() {
+        return emailEnabled;
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -69,15 +84,33 @@ public class AuthService {
         return buildAuthResponse(user);
     }
 
-    public AuthResponse register(RegisterRequest request, String clientIp) {
+    public AuthResponse register(RegisterRequest request, String clientIp, boolean isAdmin) {
+        String inviteToken = request.inviteToken();
+        boolean hasInvite = inviteToken != null && !inviteToken.isBlank();
+
+        if (!isAdmin && !hasInvite && !publicRegistration) {
+            throw new IllegalArgumentException("Registration is disabled");
+        }
+
         if (isHoneypotTriggered(request.website())) {
             return fakeAuthResponse();
         }
 
-        captchaService.validate(request.captchaToken(), request.captchaAngle());
+        if (!isAdmin) {
+            captchaService.validate(request.captchaToken(), request.captchaAngle());
+        }
 
         if (!rateLimitService.isAllowed("account:" + clientIp, 3, Duration.ofDays(1))) {
             throw new RateLimitException("Account creation limit reached");
+        }
+
+        UserRole role = UserRole.USER;
+        if (hasInvite) {
+            Invitation invitation = invitationService.consumeToken(inviteToken);
+            role = invitation.getRole();
+            if (!invitation.getEmail().equalsIgnoreCase(request.email())) {
+                throw new IllegalArgumentException("Email does not match invitation");
+            }
         }
 
         if (userRepository.existsByEmail(request.email())) {
@@ -88,9 +121,9 @@ public class AuthService {
         user.setEmail(request.email());
         user.setPasswordHash(passwordEncoder.encode(request.password()));
         user.setDisplayName(request.displayName());
-        user.setRole(UserRole.USER);
+        user.setRole(role);
 
-        if (emailEnabled) {
+        if (emailEnabled && !hasInvite) {
             user.setEmailVerified(false);
             user.setVerificationToken(UUID.randomUUID().toString());
         } else {

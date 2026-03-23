@@ -16,6 +16,8 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
     onUpdate();
   }
 
+  const customFieldEntries = Object.entries(ticket.customFields ?? {});
+
   return (
     <div className="card p-5 space-y-5">
       <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Details</h3>
@@ -41,7 +43,16 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
       </Field>
 
       <Field label="Category">
-        <p className="text-sm text-gray-900 dark:text-zinc-100">{ticket.category ?? "—"}</p>
+        {ticket.category ? (
+          <span className="flex items-center gap-2 text-sm text-gray-900 dark:text-zinc-100">
+            {ticket.categoryColor && (
+              <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: ticket.categoryColor }} />
+            )}
+            {ticket.category}
+          </span>
+        ) : (
+          <p className="text-sm text-gray-900 dark:text-zinc-100">&mdash;</p>
+        )}
       </Field>
 
       <Field label="Created">
@@ -64,6 +75,19 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
             ))}
           </div>
         </Field>
+      )}
+
+      {customFieldEntries.length > 0 && (
+        <>
+          <div className="border-t border-gray-200 dark:border-zinc-800 pt-4">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-4">Custom Fields</h3>
+          </div>
+          {customFieldEntries.map(([label, value]) => (
+            <Field key={label} label={label}>
+              <p className="text-sm text-gray-900 dark:text-zinc-100">{value || "\u2014"}</p>
+            </Field>
+          ))}
+        </>
       )}
     </div>
   );

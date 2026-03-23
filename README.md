@@ -63,6 +63,14 @@ Two modes, configurable via `ticketflow.security.public-registration`:
 - **Public registration** (`true`) — Anyone can create an account from the login page. All security protections apply (captcha, honeypot, rate limit, IP limit, email verification).
 - **Invitation only** (`false`, default) — Admins generate invite links from the Team page. Invited users register via a unique link with pre-assigned role. Links expire after 7 days and can be revoked.
 
+### Internationalization (i18n)
+
+6 languages supported, auto-detected from browser:
+
+- English, Français, Deutsch, Español, Italiano, Português
+
+Language selector in the sidebar. Persisted in localStorage. Zero external dependency.
+
 ### General
 - Dark / Light mode
 - Email notifications (SMTP) with Thymeleaf templates

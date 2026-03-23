@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Zap, Sun, Moon } from "lucide-react";
 import { resetPassword } from "../api/auth";
 
 export default function ResetPasswordPage() {
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
   const [password, setPassword] = useState("");
@@ -19,12 +21,12 @@ export default function ResetPasswordPage() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("auth.passwordsNoMatch"));
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t("auth.passwordMinLength"));
       return;
     }
 
@@ -33,7 +35,7 @@ export default function ResetPasswordPage() {
       await resetPassword({ token, password });
       setSuccess(true);
     } catch {
-      setError("Invalid or expired reset link");
+      setError(t("auth.invalidResetLink"));
     } finally {
       setLoading(false);
     }
@@ -60,20 +62,20 @@ export default function ResetPasswordPage() {
           {success ? (
             <>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Password reset</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.passwordReset")}</h2>
                 <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-                  Your password has been updated successfully.
+                  {t("auth.passwordResetSuccess")}
                 </p>
               </div>
               <Link to="/login" className="btn-primary w-full inline-block text-center">
-                Sign in
+                {t("auth.signIn")}
               </Link>
             </>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Reset password</h2>
-                <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">Enter your new password</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.resetPassword")}</h2>
+                <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">{t("auth.resetPasswordDesc")}</p>
               </div>
 
               {error && (
@@ -84,12 +86,12 @@ export default function ResetPasswordPage() {
 
               {!token && (
                 <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 rounded-md border border-amber-200 dark:border-amber-500/20">
-                  Missing reset token. Please use the link from your email.
+                  {t("auth.missingResetToken")}
                 </div>
               )}
 
               <div>
-                <label htmlFor="password" className="label">New password</label>
+                <label htmlFor="password" className="label">{t("auth.newPassword")}</label>
                 <input
                   id="password"
                   type="password"
@@ -103,7 +105,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="label">Confirm password</label>
+                <label htmlFor="confirmPassword" className="label">{t("auth.confirmPassword")}</label>
                 <input
                   id="confirmPassword"
                   type="password"
@@ -116,7 +118,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <button type="submit" disabled={loading || !token} className="btn-primary w-full">
-                {loading ? "Resetting..." : "Reset password"}
+                {loading ? t("auth.resetting") : t("auth.resetPassword")}
               </button>
             </form>
           )}

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Zap, Sun, Moon } from "lucide-react";
 import { getAuthConfig } from "../api/auth";
 import HoneypotField from "../components/HoneypotField";
@@ -10,6 +11,7 @@ import PuzzleCaptcha from "../components/PuzzleCaptcha";
 export default function LoginPage() {
   const { user, login } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +42,7 @@ export default function LoginPage() {
       await login(email, password, website, captchaToken, captchaAngle);
       navigate("/dashboard");
     } catch {
-      setError("Invalid email or password");
+      setError(t("auth.invalidCredentials"));
     } finally {
       setLoading(false);
     }
@@ -65,8 +67,8 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="card p-7 space-y-5">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Sign in</h2>
-            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">Enter your credentials to continue</p>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.signIn")}</h2>
+            <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">{t("auth.signInDesc")}</p>
           </div>
 
           {error && (
@@ -78,7 +80,7 @@ export default function LoginPage() {
           <HoneypotField value={website} onChange={setWebsite} />
 
           <div>
-            <label htmlFor="email" className="label">Email</label>
+            <label htmlFor="email" className="label">{t("auth.email")}</label>
             <input
               id="email"
               type="email"
@@ -92,7 +94,7 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="label">Password</label>
+            <label htmlFor="password" className="label">{t("auth.password")}</label>
             <input
               id="password"
               type="password"
@@ -107,23 +109,23 @@ export default function LoginPage() {
           <PuzzleCaptcha onSolved={handleCaptchaSolved} />
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? t("auth.signingIn") : t("auth.signIn")}
           </button>
 
           <div className="flex items-center justify-between text-xs">
             <Link to="/forgot-password" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-              Forgot password?
+              {t("auth.forgotPassword")}
             </Link>
             <span className="text-gray-400 dark:text-zinc-500">
-              Demo: admin@ticketflow.local / password123
+              {t("auth.demo")}
             </span>
           </div>
 
           {publicRegistration && (
             <p className="text-xs text-center text-gray-500 dark:text-zinc-400">
-              Don't have an account?{" "}
+              {t("auth.dontHaveAccount")}{" "}
               <Link to="/register" className="text-indigo-600 dark:text-indigo-400 hover:underline">
-                Create one
+                {t("auth.createOne")}
               </Link>
             </p>
           )}

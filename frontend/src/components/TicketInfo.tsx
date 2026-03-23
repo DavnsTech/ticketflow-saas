@@ -1,6 +1,7 @@
 import type { TicketResponse } from "../api/tickets";
 import { updateTicket } from "../api/tickets";
 import { getInitials } from "../utils";
+import { useI18n } from "../contexts/I18nContext";
 
 const statuses = ["OPEN", "IN_PROGRESS", "WAITING", "RESOLVED", "CLOSED"];
 const priorities = ["LOW", "MEDIUM", "HIGH", "URGENT"];
@@ -11,6 +12,8 @@ interface TicketInfoProps {
 }
 
 export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
+  const { t } = useI18n();
+
   async function handleChange(field: string, value: string) {
     await updateTicket(ticket.id, { [field]: value });
     onUpdate();
@@ -20,29 +23,29 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
 
   return (
     <div className="card p-5 space-y-5">
-      <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">Details</h3>
+      <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">{t("detail.details")}</h3>
 
-      <Field label="Status">
+      <Field label={t("detail.status")}>
         <select value={ticket.status} onChange={(e) => handleChange("status", e.target.value)} className="input-field text-xs py-1.5">
           {statuses.map((s) => <option key={s} value={s}>{s.replace("_", " ")}</option>)}
         </select>
       </Field>
 
-      <Field label="Priority">
+      <Field label={t("detail.priority")}>
         <select value={ticket.priority} onChange={(e) => handleChange("priority", e.target.value)} className="input-field text-xs py-1.5">
           {priorities.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       </Field>
 
-      <Field label="Requester">
+      <Field label={t("detail.requester")}>
         <UserDisplay name={ticket.requesterName} />
       </Field>
 
-      <Field label="Assignee">
-        <UserDisplay name={ticket.assigneeName ?? "Unassigned"} />
+      <Field label={t("detail.assignee")}>
+        <UserDisplay name={ticket.assigneeName ?? t("detail.unassigned")} />
       </Field>
 
-      <Field label="Category">
+      <Field label={t("detail.category")}>
         {ticket.category ? (
           <span className="flex items-center gap-2 text-sm text-gray-900 dark:text-zinc-100">
             {ticket.categoryColor && (
@@ -55,18 +58,18 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
         )}
       </Field>
 
-      <Field label="Created">
+      <Field label={t("detail.created")}>
         <p className="text-xs text-gray-600 dark:text-zinc-400 tabular-nums">{new Date(ticket.createdAt).toLocaleString()}</p>
       </Field>
 
       {ticket.resolvedAt && (
-        <Field label="Resolved">
+        <Field label={t("detail.resolved")}>
           <p className="text-xs text-emerald-600 dark:text-emerald-400 tabular-nums">{new Date(ticket.resolvedAt).toLocaleString()}</p>
         </Field>
       )}
 
       {ticket.tags.length > 0 && (
-        <Field label="Tags">
+        <Field label={t("detail.tags")}>
           <div className="flex flex-wrap gap-1.5">
             {ticket.tags.map((tag) => (
               <span key={tag} className="px-2 py-0.5 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 rounded text-xs font-medium">
@@ -80,7 +83,7 @@ export default function TicketInfo({ ticket, onUpdate }: TicketInfoProps) {
       {customFieldEntries.length > 0 && (
         <>
           <div className="border-t border-gray-200 dark:border-zinc-800 pt-4">
-            <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-4">Custom Fields</h3>
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-4">{t("detail.customFields")}</h3>
           </div>
           {customFieldEntries.map(([label, value]) => (
             <Field key={label} label={label}>

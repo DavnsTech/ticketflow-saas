@@ -4,12 +4,14 @@ import type { UserResponse } from "../api/users";
 import { createInvitation, listInvitations, deleteInvitation } from "../api/invitations";
 import type { InvitationResponse } from "../api/invitations";
 import { useAuth } from "../contexts/AuthContext";
+import { useI18n } from "../contexts/I18nContext";
 import { RoleBadge } from "../components/StatusBadge";
 import { getInitials } from "../utils";
 import { Shield, UserPlus, Copy, Trash2, Mail, Check, X } from "lucide-react";
 
 export default function TeamPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [invitations, setInvitations] = useState<InvitationResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,31 +66,31 @@ export default function TeamPage() {
       {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Team</h2>
-          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{users.length} members</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("team.title")}</h2>
+          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t("team.members", { count: users.length })}</p>
         </div>
         <div className="flex items-center gap-3 text-xs text-gray-400 dark:text-zinc-500">
-          <span className="flex items-center gap-1"><Shield size={12} /> {teamByRole.admins.length} admins</span>
-          <span>{teamByRole.agents.length} agents</span>
-          <span>{teamByRole.users.length} users</span>
+          <span className="flex items-center gap-1"><Shield size={12} /> {teamByRole.admins.length} {t("team.admins").toLowerCase()}</span>
+          <span>{teamByRole.agents.length} {t("team.agents").toLowerCase()}</span>
+          <span>{teamByRole.users.length} {t("team.users").toLowerCase()}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatBlock label="Admins" count={teamByRole.admins.length} accent="text-purple-600 dark:text-purple-400" />
-        <StatBlock label="Agents" count={teamByRole.agents.length} accent="text-teal-600 dark:text-teal-400" />
-        <StatBlock label="Users" count={teamByRole.users.length} accent="text-gray-600 dark:text-zinc-400" />
+        <StatBlock label={t("team.admins")} count={teamByRole.admins.length} accent="text-purple-600 dark:text-purple-400" />
+        <StatBlock label={t("team.agents")} count={teamByRole.agents.length} accent="text-teal-600 dark:text-teal-400" />
+        <StatBlock label={t("team.users")} count={teamByRole.users.length} accent="text-gray-600 dark:text-zinc-400" />
       </div>
 
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 dark:bg-zinc-800/50 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-              <th className="px-4 py-3">Member</th>
-              <th className="px-4 py-3">Email</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Joined</th>
-              {isAdmin && <th className="px-4 py-3 text-right">Actions</th>}
+              <th className="px-4 py-3">{t("team.member")}</th>
+              <th className="px-4 py-3">{t("team.email")}</th>
+              <th className="px-4 py-3">{t("team.role")}</th>
+              <th className="px-4 py-3">{t("team.joined")}</th>
+              {isAdmin && <th className="px-4 py-3 text-right">{t("team.actions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -108,12 +110,12 @@ export default function TeamPage() {
       {isAdmin && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">Invitations</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">{t("team.invitations")}</h3>
             <button
               onClick={() => setShowInviteForm(true)}
               className="btn-primary text-xs flex items-center gap-1.5"
             >
-              <UserPlus size={14} /> Invite member
+              <UserPlus size={14} /> {t("team.inviteMember")}
             </button>
           </div>
 
@@ -129,10 +131,10 @@ export default function TeamPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50 dark:bg-zinc-800/50 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                    <th className="px-4 py-3">Email</th>
-                    <th className="px-4 py-3">Role</th>
-                    <th className="px-4 py-3">Expires</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="px-4 py-3">{t("team.email")}</th>
+                    <th className="px-4 py-3">{t("team.role")}</th>
+                    <th className="px-4 py-3">{t("team.expires")}</th>
+                    <th className="px-4 py-3 text-right">{t("team.actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -151,8 +153,8 @@ export default function TeamPage() {
                   <Mail size={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-zinc-100">No pending invitations</p>
-                  <p className="text-xs text-gray-500 dark:text-zinc-400">Invite team members to give them access</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-zinc-100">{t("team.noInvitations")}</p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">{t("team.noInvitationsDesc")}</p>
                 </div>
               </div>
             </div>
@@ -164,6 +166,7 @@ export default function TeamPage() {
 }
 
 function InviteForm({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
   const [loading, setLoading] = useState(false);
@@ -188,7 +191,7 @@ function InviteForm({ onClose, onCreated }: { onClose: () => void; onCreated: ()
     <div className="card p-5">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">New invitation</h4>
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">{t("team.newInvitation")}</h4>
           <button type="button" onClick={onClose} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300">
             <X size={16} />
           </button>
@@ -202,7 +205,7 @@ function InviteForm({ onClose, onCreated }: { onClose: () => void; onCreated: ()
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2">
-            <label htmlFor="inviteEmail" className="label">Email</label>
+            <label htmlFor="inviteEmail" className="label">{t("team.email")}</label>
             <input
               id="inviteEmail"
               type="email"
@@ -215,26 +218,26 @@ function InviteForm({ onClose, onCreated }: { onClose: () => void; onCreated: ()
             />
           </div>
           <div>
-            <label htmlFor="inviteRole" className="label">Role</label>
+            <label htmlFor="inviteRole" className="label">{t("team.role")}</label>
             <select
               id="inviteRole"
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="input-field"
             >
-              <option value="USER">User</option>
-              <option value="AGENT">Agent</option>
-              <option value="ADMIN">Admin</option>
+              <option value="USER">{t("team.roleUser")}</option>
+              <option value="AGENT">{t("team.roleAgent")}</option>
+              <option value="ADMIN">{t("team.roleAdmin")}</option>
             </select>
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
-            Cancel
+            {t("team.cancel")}
           </button>
           <button type="submit" disabled={loading} className="btn-primary text-xs">
-            {loading ? "Sending..." : "Send invitation"}
+            {loading ? t("team.sending") : t("team.sendInvitation")}
           </button>
         </div>
       </form>
@@ -243,6 +246,7 @@ function InviteForm({ onClose, onCreated }: { onClose: () => void; onCreated: ()
 }
 
 function InvitationRow({ invitation, onDeleted }: { invitation: InvitationResponse; onDeleted: () => void }) {
+  const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
   function copyLink() {
@@ -269,14 +273,14 @@ function InvitationRow({ invitation, onDeleted }: { invitation: InvitationRespon
           <button
             onClick={copyLink}
             className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-            title="Copy invite link"
+            title={t("team.copyLink")}
           >
             {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
           </button>
           <button
             onClick={handleDelete}
             className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-            title="Revoke invitation"
+            title={t("team.revoke")}
           >
             <Trash2 size={14} />
           </button>
@@ -296,6 +300,7 @@ function StatBlock({ label, count, accent }: { label: string; count: number; acc
 }
 
 function MemberRow({ member, isAdmin, isSelf, onRoleChange }: { member: UserResponse; isAdmin: boolean; isSelf: boolean; onRoleChange: (id: number, role: string) => void }) {
+  const { t } = useI18n();
   const initials = getInitials(member.displayName);
 
   return (
@@ -321,12 +326,12 @@ function MemberRow({ member, isAdmin, isSelf, onRoleChange }: { member: UserResp
               onChange={(e) => onRoleChange(member.id, e.target.value)}
               className="input-field w-auto text-xs py-1"
             >
-              <option value="USER">User</option>
-              <option value="AGENT">Agent</option>
-              <option value="ADMIN">Admin</option>
+              <option value="USER">{t("team.roleUser")}</option>
+              <option value="AGENT">{t("team.roleAgent")}</option>
+              <option value="ADMIN">{t("team.roleAdmin")}</option>
             </select>
           ) : (
-            <span className="text-xs text-gray-400 dark:text-zinc-500">You</span>
+            <span className="text-xs text-gray-400 dark:text-zinc-500">{t("team.you")}</span>
           )}
         </td>
       )}

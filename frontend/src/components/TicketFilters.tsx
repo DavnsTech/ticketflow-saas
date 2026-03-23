@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { listCategories } from "../api/categories";
 import type { CategoryResponse } from "../api/categories";
+import { useI18n } from "../contexts/I18nContext";
 
 interface TicketFiltersProps {
   status: string;
@@ -27,6 +28,7 @@ export default function TicketFilters({
   onSearchChange,
   onCategoryChange,
 }: TicketFiltersProps) {
+  const { t } = useI18n();
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function TicketFilters({
           type="text"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search tickets..."
+          placeholder={t("tickets.searchPlaceholder")}
           className="input-field pl-9"
         />
       </div>
@@ -53,7 +55,7 @@ export default function TicketFilters({
         onChange={(event) => onStatusChange(event.target.value)}
         className="input-field w-auto min-w-[140px]"
       >
-        <option value="">All Statuses</option>
+        <option value="">{t("tickets.allStatuses")}</option>
         {statuses.filter(Boolean).map((s) => (
           <option key={s} value={s}>{s.replace("_", " ")}</option>
         ))}
@@ -64,7 +66,7 @@ export default function TicketFilters({
         onChange={(event) => onPriorityChange(event.target.value)}
         className="input-field w-auto min-w-[140px]"
       >
-        <option value="">All Priorities</option>
+        <option value="">{t("tickets.allPriorities")}</option>
         {priorities.filter(Boolean).map((p) => (
           <option key={p} value={p}>{p}</option>
         ))}
@@ -75,7 +77,7 @@ export default function TicketFilters({
         onChange={(event) => onCategoryChange(event.target.value)}
         className="input-field w-auto min-w-[140px]"
       >
-        <option value="">All Categories</option>
+        <option value="">{t("tickets.allCategories")}</option>
         {categories.map((c) => (
           <option key={c.id} value={c.id}>{c.name}</option>
         ))}

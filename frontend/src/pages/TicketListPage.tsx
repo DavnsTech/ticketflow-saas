@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { listTickets } from "../api/tickets";
 import type { TicketResponse } from "../api/tickets";
 import { useAuth } from "../contexts/AuthContext";
+import { useI18n } from "../contexts/I18nContext";
 import TicketTable from "../components/TicketTable";
 import TicketFilters from "../components/TicketFilters";
 import TicketForm from "../components/TicketForm";
@@ -9,6 +10,7 @@ import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function TicketListPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [tickets, setTickets] = useState<TicketResponse[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
@@ -56,7 +58,7 @@ export default function TicketListPage() {
   }
 
   const filteredTickets = search
-    ? tickets.filter((t) => t.title.toLowerCase().includes(search.toLowerCase()))
+    ? tickets.filter((ticket) => ticket.title.toLowerCase().includes(search.toLowerCase()))
     : tickets;
 
   return (
@@ -65,15 +67,15 @@ export default function TicketListPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">
-            {isClient ? "My Tickets" : "Tickets"}
+            {isClient ? t("tickets.myTickets") : t("tickets.title")}
           </h2>
           <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">
-            {totalElements} {isClient ? "ticket" : "total ticket"}{totalElements !== 1 ? "s" : ""}
+            {t("tickets.totalTickets", { count: totalElements })}
           </p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
           <Plus size={16} />
-          {isClient ? "New Request" : "New Ticket"}
+          {isClient ? t("tickets.newRequest") : t("tickets.newTicket")}
         </button>
       </div>
 
@@ -93,7 +95,7 @@ export default function TicketListPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-gray-500 dark:text-zinc-400">
-            Page {page + 1} of {totalPages}
+            {t("tickets.page", { current: page + 1, total: totalPages })}
           </p>
           <div className="flex items-center gap-1">
             <button

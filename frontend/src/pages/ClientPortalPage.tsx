@@ -6,6 +6,7 @@ import type { CategoryResponse } from "../api/categories";
 import { StatusBadge } from "../components/StatusBadge";
 import TicketWizard from "../components/TicketWizard";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "../contexts/I18nContext";
 import { Plus, Loader2 } from "lucide-react";
 
 interface SelectedCategory {
@@ -16,6 +17,7 @@ interface SelectedCategory {
 
 export default function ClientPortalPage() {
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [tickets, setTickets] = useState<TicketResponse[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [wizardCategory, setWizardCategory] = useState<SelectedCategory | null>(null);
@@ -62,18 +64,18 @@ export default function ClientPortalPage() {
       {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
 
       <div className="text-center pt-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">Support Center</h1>
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">How can we help you today?</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">{t("portal.title")}</h1>
+        <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">{t("portal.subtitle")}</p>
       </div>
 
       <div className="flex items-center justify-center gap-6">
-        <StatPill label="Open Requests" count={stats.open} color="text-blue-600 dark:text-blue-400" />
-        <StatPill label="In Progress" count={stats.inProgress} color="text-amber-600 dark:text-amber-400" />
-        <StatPill label="Resolved" count={stats.resolved} color="text-emerald-600 dark:text-emerald-400" />
+        <StatPill label={t("portal.openRequests")} count={stats.open} color="text-blue-600 dark:text-blue-400" />
+        <StatPill label={t("portal.inProgress")} count={stats.inProgress} color="text-amber-600 dark:text-amber-400" />
+        <StatPill label={t("portal.resolved")} count={stats.resolved} color="text-emerald-600 dark:text-emerald-400" />
       </div>
 
       <div>
-        <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-3">Choose a topic</h2>
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-3">{t("portal.chooseTopic")}</h2>
         {loadingCategories ? (
           <div className="flex justify-center py-8">
             <Loader2 size={20} className="animate-spin text-gray-400" />
@@ -110,13 +112,13 @@ export default function ClientPortalPage() {
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">My Requests</h2>
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">{t("portal.myRequests")}</h2>
           {categories.length > 0 && (
             <button
               onClick={() => handleCategoryClick(categories[0])}
               className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium flex items-center gap-1"
             >
-              <Plus size={12} /> New Request
+              <Plus size={12} /> {t("portal.newRequest")}
             </button>
           )}
         </div>
@@ -150,7 +152,7 @@ export default function ClientPortalPage() {
           </div>
         ) : (
           <div className="card p-8 text-center">
-            <p className="text-sm text-gray-400 dark:text-zinc-500">No requests yet</p>
+            <p className="text-sm text-gray-400 dark:text-zinc-500">{t("portal.noRequests")}</p>
             <p className="text-xs text-gray-400 dark:text-zinc-600 mt-1">
               Select a topic above to create your first request
             </p>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Zap, Sun, Moon, ArrowLeft } from "lucide-react";
 import { register, validateInvite, getAuthConfig } from "../api/auth";
 import HoneypotField from "../components/HoneypotField";
@@ -10,6 +11,7 @@ import PuzzleCaptcha from "../components/PuzzleCaptcha";
 export default function RegisterPage() {
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const inviteToken = searchParams.get("invite") || "";
 
@@ -35,7 +37,7 @@ export default function RegisterPage() {
           setAllowed(true);
         })
         .catch(() => {
-          setError("Invalid or expired invitation link");
+          setError(t("auth.invalidInvitationDesc"));
           setAllowed(false);
         });
     } else {
@@ -57,7 +59,7 @@ export default function RegisterPage() {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("auth.passwordsNoMatch"));
       return;
     }
 
@@ -75,7 +77,7 @@ export default function RegisterPage() {
       setSuccess(true);
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(message || "Registration failed");
+      setError(message || t("auth.registrationFailed"));
     } finally {
       setLoading(false);
     }
@@ -107,27 +109,27 @@ export default function RegisterPage() {
 
           {allowed === false && !inviteToken && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Registration disabled</h2>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">Public registration is not enabled. Contact an admin for an invitation.</p>
-              <Link to="/login" className="btn-primary w-full inline-block text-center">Back to sign in</Link>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.registrationDisabled")}</h2>
+              <p className="text-sm text-gray-500 dark:text-zinc-400">{t("auth.registrationDisabledDesc")}</p>
+              <Link to="/login" className="btn-primary w-full inline-block text-center">{t("auth.backToSignIn")}</Link>
             </>
           )}
 
           {allowed === false && inviteToken && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Invalid invitation</h2>
-              <p className="text-sm text-red-600 dark:text-red-400">{error || "This invitation link is invalid or has expired."}</p>
-              <Link to="/login" className="btn-primary w-full inline-block text-center">Back to sign in</Link>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.invalidInvitation")}</h2>
+              <p className="text-sm text-red-600 dark:text-red-400">{error || t("auth.invalidInvitationDesc")}</p>
+              <Link to="/login" className="btn-primary w-full inline-block text-center">{t("auth.backToSignIn")}</Link>
             </>
           )}
 
           {success && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Account created</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.accountCreated")}</h2>
               <p className="text-sm text-gray-500 dark:text-zinc-400">
-                {inviteToken ? "Your account is ready. You can now sign in." : "Check your email to verify your account."}
+                {inviteToken ? t("auth.accountCreatedInvite") : t("auth.accountCreatedPublic")}
               </p>
-              <Link to="/login" className="btn-primary w-full inline-block text-center">Sign in</Link>
+              <Link to="/login" className="btn-primary w-full inline-block text-center">{t("auth.signIn")}</Link>
             </>
           )}
 
@@ -135,12 +137,12 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">
-                  {inviteToken ? "Accept invitation" : "Create account"}
+                  {inviteToken ? t("auth.acceptInvitation") : t("auth.createAccount")}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
                   {inviteToken
-                    ? `You've been invited as ${inviteRole}`
-                    : "Fill in your details to get started"}
+                    ? t("auth.invitedAs", { role: inviteRole })
+                    : t("auth.fillDetails")}
                 </p>
               </div>
 
@@ -153,7 +155,7 @@ export default function RegisterPage() {
               <HoneypotField value={website} onChange={setWebsite} />
 
               <div>
-                <label htmlFor="displayName" className="label">Name</label>
+                <label htmlFor="displayName" className="label">{t("auth.name")}</label>
                 <input
                   id="displayName"
                   type="text"
@@ -167,7 +169,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="email" className="label">Email</label>
+                <label htmlFor="email" className="label">{t("auth.email")}</label>
                 <input
                   id="email"
                   type="email"
@@ -181,7 +183,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="label">Password</label>
+                <label htmlFor="password" className="label">{t("auth.password")}</label>
                 <input
                   id="password"
                   type="password"
@@ -194,7 +196,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="label">Confirm password</label>
+                <label htmlFor="confirmPassword" className="label">{t("auth.confirmPassword")}</label>
                 <input
                   id="confirmPassword"
                   type="password"
@@ -209,11 +211,11 @@ export default function RegisterPage() {
               <PuzzleCaptcha onSolved={handleCaptchaSolved} />
 
               <button type="submit" disabled={loading} className="btn-primary w-full">
-                {loading ? "Creating account..." : "Create account"}
+                {loading ? t("auth.creatingAccount") : t("auth.createAccount")}
               </button>
 
               <Link to="/login" className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300">
-                <ArrowLeft size={12} /> Already have an account? Sign in
+                <ArrowLeft size={12} /> {t("auth.alreadyHaveAccount")}
               </Link>
             </form>
           )}

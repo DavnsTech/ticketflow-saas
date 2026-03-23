@@ -1,6 +1,8 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n, LOCALE_NAMES } from "../contexts/I18nContext";
+import type { Locale } from "../contexts/I18nContext";
 import { getInitials } from "../utils";
 import { LayoutDashboard, Ticket, Users, LogOut, Sun, Moon, Zap, LifeBuoy, Settings } from "lucide-react";
 
@@ -23,6 +25,7 @@ function NavLink({ to, label, icon: Icon, active }: { to: string; label: string;
 export default function Layout() {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
+  const { t, locale, setLocale } = useI18n();
   const location = useLocation();
 
   const initials = user?.displayName ? getInitials(user.displayName) : "";
@@ -32,13 +35,13 @@ export default function Layout() {
 
   const navItems = isClient
     ? [
-        { to: "/portal", label: "Support", icon: LifeBuoy },
+        { to: "/portal", label: t("nav.support"), icon: LifeBuoy },
       ]
     : [
-        { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-        { to: "/tickets", label: "Tickets", icon: Ticket },
-        { to: "/team", label: "Team", icon: Users },
-        ...(isAdmin ? [{ to: "/settings", label: "Settings", icon: Settings }] : []),
+        { to: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard },
+        { to: "/tickets", label: t("nav.tickets"), icon: Ticket },
+        { to: "/team", label: t("nav.team"), icon: Users },
+        ...(isAdmin ? [{ to: "/settings", label: t("nav.settings"), icon: Settings }] : []),
       ];
 
   return (
@@ -63,8 +66,18 @@ export default function Layout() {
             className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            {theme === "dark" ? "Light mode" : "Dark mode"}
+            {theme === "dark" ? t("nav.lightMode") : t("nav.darkMode")}
           </button>
+
+          <select
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+            className="w-full px-3 py-2 rounded-md text-[13px] text-gray-600 dark:text-zinc-400 bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors border-0 cursor-pointer"
+          >
+            {(Object.entries(LOCALE_NAMES) as [Locale, string][]).map(([code, name]) => (
+              <option key={code} value={code}>{name}</option>
+            ))}
+          </select>
 
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-xs font-semibold text-indigo-700 dark:text-indigo-400 shrink-0">
@@ -77,7 +90,7 @@ export default function Layout() {
             <button
               onClick={logout}
               className="p-1.5 text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-              title="Sign out"
+              title={t("nav.signOut")}
             >
               <LogOut size={14} />
             </button>

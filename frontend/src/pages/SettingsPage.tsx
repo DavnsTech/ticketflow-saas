@@ -14,11 +14,13 @@ import type { CategoryResponse, CustomFieldResponse } from "../api/categories";
 import { listUsers } from "../api/users";
 import type { UserResponse } from "../api/users";
 import { Settings, Plus, ChevronDown, ChevronUp, Trash2, ToggleLeft, ToggleRight, Users } from "lucide-react";
+import { useI18n } from "../contexts/I18nContext";
 
 const PRESET_COLORS = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#6366f1", "#ec4899", "#6b7280"];
 const FIELD_TYPES = ["TEXT", "SELECT", "URL", "NUMBER"];
 
 export default function SettingsPage() {
+  const { t } = useI18n();
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [agents, setAgents] = useState<UserResponse[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -75,12 +77,12 @@ export default function SettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 flex items-center gap-2">
-            <Settings size={20} /> Settings
+            <Settings size={20} /> {t("settings.title")}
           </h2>
-          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Manage categories and custom fields</p>
+          <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t("settings.subtitle")}</p>
         </div>
         <button onClick={() => setShowAddForm(true)} className="btn-primary text-xs flex items-center gap-1.5">
-          <Plus size={14} /> Add Category
+          <Plus size={14} /> {t("settings.addCategory")}
         </button>
       </div>
 
@@ -117,7 +119,7 @@ export default function SettingsPage() {
 
         {categories.length === 0 && !showAddForm && (
           <div className="card p-5 text-center text-sm text-gray-400 dark:text-zinc-500">
-            No categories yet. Create one to get started.
+            {t("settings.noCategories")}
           </div>
         )}
       </div>
@@ -136,6 +138,8 @@ function CategoryHeader({
   onToggleExpand: () => void;
   onToggleActive: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="flex items-center justify-between px-4 py-3">
       <button onClick={onToggleExpand} className="flex items-center gap-3 flex-1 text-left">
@@ -158,12 +162,12 @@ function CategoryHeader({
               : "bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-zinc-500"
           }`}
         >
-          {category.active ? "Active" : "Inactive"}
+          {category.active ? t("settings.active") : t("settings.inactive")}
         </span>
         <button
           onClick={onToggleActive}
           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
-          title={category.active ? "Deactivate" : "Activate"}
+          title={category.active ? t("settings.deactivate") : t("settings.activate")}
         >
           {category.active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
         </button>
@@ -184,6 +188,7 @@ function CategoryDetail({
   agents: UserResponse[];
   onUpdated: () => void;
 }) {
+  const { t } = useI18n();
   const [fields, setFields] = useState<CustomFieldResponse[]>([]);
   const [showFieldForm, setShowFieldForm] = useState(false);
 
@@ -218,12 +223,12 @@ function CategoryDetail({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">Custom Fields</h4>
+          <h4 className="text-xs font-semibold text-gray-700 dark:text-zinc-300 uppercase tracking-wider">{t("settings.customFields")}</h4>
           <button
             onClick={() => setShowFieldForm(true)}
             className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
           >
-            <Plus size={12} /> Add field
+            <Plus size={12} /> {t("settings.addField")}
           </button>
         </div>
 
@@ -247,7 +252,7 @@ function CategoryDetail({
         )}
 
         {fields.length === 0 && !showFieldForm && (
-          <p className="text-xs text-gray-400 dark:text-zinc-500">No custom fields for this category.</p>
+          <p className="text-xs text-gray-400 dark:text-zinc-500">{t("settings.noFieldsCategory")}</p>
         )}
       </div>
     </div>
@@ -269,6 +274,7 @@ function CategoryForm({
   onCancel?: () => void;
   onAgentsChange?: (agentIds: number[]) => Promise<void>;
 }) {
+  const { t } = useI18n();
   const [name, setName] = useState(initialValues?.name ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [color, setColor] = useState(initialValues?.color ?? "#3b82f6");
@@ -289,22 +295,22 @@ function CategoryForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="label">Name</label>
+          <label className="label">{t("settings.categoryName")}</label>
           <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div>
-          <label className="label">Icon</label>
-          <input className="input-field" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="e.g. bug, server" />
+          <label className="label">{t("settings.categoryIcon")}</label>
+          <input className="input-field" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder={t("settings.iconPlaceholder")} />
         </div>
       </div>
 
       <div>
-        <label className="label">Description</label>
+        <label className="label">{t("settings.categoryDesc")}</label>
         <input className="input-field" value={description} onChange={(e) => setDescription(e.target.value)} />
       </div>
 
       <div>
-        <label className="label">Color</label>
+        <label className="label">{t("settings.categoryColor")}</label>
         <ColorPicker value={color} onChange={setColor} />
       </div>
 
@@ -315,11 +321,11 @@ function CategoryForm({
       <div className="flex justify-end gap-2">
         {onCancel && (
           <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
-            Cancel
+            {t("settings.cancel")}
           </button>
         )}
         <button type="submit" disabled={saving} className="btn-primary text-xs">
-          {saving ? "Saving..." : initialValues ? "Update" : "Create"}
+          {saving ? t("settings.saving") : initialValues ? t("settings.update") : t("settings.create")}
         </button>
       </div>
     </form>
@@ -353,6 +359,8 @@ function AgentSelector({
   assignedIds: number[];
   onChange: (agentIds: number[]) => Promise<void>;
 }) {
+  const { t } = useI18n();
+
   async function handleToggle(agentId: number) {
     const updated = assignedIds.includes(agentId)
       ? assignedIds.filter((id) => id !== agentId)
@@ -363,7 +371,7 @@ function AgentSelector({
   return (
     <div>
       <label className="label flex items-center gap-1.5">
-        <Users size={12} /> Assigned Agents
+        <Users size={12} /> {t("settings.assignedAgents")}
       </label>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 mt-1">
         {agents.map((agent) => (
@@ -392,6 +400,7 @@ function CustomFieldForm({
   onSave: (payload: { name: string; label: string; fieldType?: string; required?: boolean; options?: string; placeholder?: string }) => Promise<void>;
   onCancel: () => void;
 }) {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [label, setLabel] = useState("");
   const [fieldType, setFieldType] = useState("TEXT");
@@ -421,15 +430,15 @@ function CustomFieldForm({
     <form onSubmit={handleSubmit} className="card p-4 space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label className="label">Name</label>
-          <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} required placeholder="field_name" />
+          <label className="label">{t("settings.fieldName")}</label>
+          <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} required placeholder={t("settings.fieldNamePlaceholder")} />
         </div>
         <div>
-          <label className="label">Label</label>
-          <input className="input-field" value={label} onChange={(e) => setLabel(e.target.value)} required placeholder="Display Label" />
+          <label className="label">{t("settings.fieldLabel")}</label>
+          <input className="input-field" value={label} onChange={(e) => setLabel(e.target.value)} required placeholder={t("settings.fieldLabelPlaceholder")} />
         </div>
         <div>
-          <label className="label">Type</label>
+          <label className="label">{t("settings.fieldType")}</label>
           <select className="input-field" value={fieldType} onChange={(e) => setFieldType(e.target.value)}>
             {FIELD_TYPES.map((type) => (
               <option key={type} value={type}>{type}</option>
@@ -440,7 +449,7 @@ function CustomFieldForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="label">Placeholder</label>
+          <label className="label">{t("settings.placeholder")}</label>
           <input className="input-field" value={placeholder} onChange={(e) => setPlaceholder(e.target.value)} />
         </div>
         <div className="flex items-end pb-1">
@@ -451,14 +460,14 @@ function CustomFieldForm({
               onChange={(e) => setRequired(e.target.checked)}
               className="rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500"
             />
-            Required field
+            {t("settings.requiredField")}
           </label>
         </div>
       </div>
 
       {fieldType === "SELECT" && (
         <div>
-          <label className="label">Options (one per line)</label>
+          <label className="label">{t("settings.optionsPerLine")}</label>
           <textarea
             className="input-field"
             rows={3}
@@ -471,10 +480,10 @@ function CustomFieldForm({
 
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} className="px-3 py-1.5 text-xs text-gray-600 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors">
-          Cancel
+          {t("settings.cancel")}
         </button>
         <button type="submit" disabled={saving} className="btn-primary text-xs">
-          {saving ? "Saving..." : "Add Field"}
+          {saving ? t("settings.saving") : t("settings.addFieldBtn")}
         </button>
       </div>
     </form>
@@ -482,6 +491,8 @@ function CustomFieldForm({
 }
 
 function FieldRow({ field, onUpdated }: { field: CustomFieldResponse; onUpdated: () => void }) {
+  const { t } = useI18n();
+
   async function handleToggle() {
     await toggleCustomField(field.id);
     onUpdated();
@@ -501,7 +512,7 @@ function FieldRow({ field, onUpdated }: { field: CustomFieldResponse; onUpdated:
         </span>
         {field.required && (
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 font-medium">
-            Required
+            {t("settings.required")}
           </span>
         )}
       </div>
@@ -509,14 +520,14 @@ function FieldRow({ field, onUpdated }: { field: CustomFieldResponse; onUpdated:
         <button
           onClick={handleToggle}
           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
-          title={field.active ? "Deactivate" : "Activate"}
+          title={field.active ? t("settings.deactivate") : t("settings.activate")}
         >
           {field.active ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
         </button>
         <button
           onClick={handleDelete}
           className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-colors"
-          title="Delete field"
+          title={t("settings.deleteField")}
         >
           <Trash2 size={14} />
         </button>

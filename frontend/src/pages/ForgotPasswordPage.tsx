@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Zap, Sun, Moon, ArrowLeft } from "lucide-react";
 import { forgotPassword } from "../api/auth";
 import HoneypotField from "../components/HoneypotField";
@@ -8,6 +9,7 @@ import PuzzleCaptcha from "../components/PuzzleCaptcha";
 
 export default function ForgotPasswordPage() {
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");
@@ -30,7 +32,7 @@ export default function ForgotPasswordPage() {
       await forgotPassword({ email, website, captchaToken, captchaAngle });
       setSent(true);
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t("auth.somethingWrong"));
     } finally {
       setLoading(false);
     }
@@ -57,21 +59,21 @@ export default function ForgotPasswordPage() {
           {sent ? (
             <>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Check your email</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.checkEmail")}</h2>
                 <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-                  If an account exists for {email}, we sent a reset link.
+                  {t("auth.checkEmailDesc", { email })}
                 </p>
               </div>
               <Link to="/login" className="btn-primary w-full inline-block text-center">
-                Back to sign in
+                {t("auth.backToSignIn")}
               </Link>
             </>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Forgot password</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.forgotPasswordTitle")}</h2>
                 <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">
-                  Enter your email and we'll send you a reset link
+                  {t("auth.forgotPasswordDesc")}
                 </p>
               </div>
 
@@ -84,7 +86,7 @@ export default function ForgotPasswordPage() {
               <HoneypotField value={website} onChange={setWebsite} />
 
               <div>
-                <label htmlFor="email" className="label">Email</label>
+                <label htmlFor="email" className="label">{t("auth.email")}</label>
                 <input
                   id="email"
                   type="email"
@@ -100,11 +102,11 @@ export default function ForgotPasswordPage() {
               <PuzzleCaptcha onSolved={handleCaptchaSolved} />
 
               <button type="submit" disabled={loading} className="btn-primary w-full">
-                {loading ? "Sending..." : "Send reset link"}
+                {loading ? t("auth.sending") : t("auth.sendResetLink")}
               </button>
 
               <Link to="/login" className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300">
-                <ArrowLeft size={12} /> Back to sign in
+                <ArrowLeft size={12} /> {t("auth.backToSignIn")}
               </Link>
             </form>
           )}

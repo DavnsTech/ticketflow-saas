@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { fetchCaptcha } from "../api/captcha";
+import { useI18n } from "../contexts/I18nContext";
 import { RefreshCw } from "lucide-react";
 
 interface PuzzleCaptchaProps {
@@ -7,6 +8,7 @@ interface PuzzleCaptchaProps {
 }
 
 export default function PuzzleCaptcha({ onSolved }: PuzzleCaptchaProps) {
+  const { t } = useI18n();
   const [image, setImage] = useState("");
   const [token, setToken] = useState("");
   const [angle, setAngle] = useState(0);
@@ -39,12 +41,12 @@ export default function PuzzleCaptcha({ onSolved }: PuzzleCaptchaProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="label">Rotate the arrow upward</span>
+        <span className="label">{t("auth.captchaRotate")}</span>
         <button
           type="button"
           onClick={loadCaptcha}
           className="p-1.5 rounded-md text-gray-400 dark:text-zinc-500 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
-          title="New captcha"
+          title={t("auth.newCaptcha")}
         >
           <RefreshCw size={14} />
         </button>

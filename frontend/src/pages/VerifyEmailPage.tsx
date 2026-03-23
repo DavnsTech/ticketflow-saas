@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTheme } from "../contexts/ThemeContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Zap, Sun, Moon } from "lucide-react";
 import { verifyEmail } from "../api/auth";
 
 export default function VerifyEmailPage() {
   const { theme, toggle } = useTheme();
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -42,26 +44,26 @@ export default function VerifyEmailPage() {
           {status === "loading" && (
             <>
               <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-sm text-gray-500 dark:text-zinc-400">Verifying your email...</p>
+              <p className="text-sm text-gray-500 dark:text-zinc-400">{t("auth.verifyingEmail")}</p>
             </>
           )}
 
           {status === "success" && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Email verified</h2>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">Your email has been verified. You can now sign in.</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.emailVerified")}</h2>
+              <p className="text-sm text-gray-500 dark:text-zinc-400">{t("auth.emailVerifiedDesc")}</p>
               <Link to="/login" className="btn-primary w-full inline-block text-center">
-                Sign in
+                {t("auth.signIn")}
               </Link>
             </>
           )}
 
           {status === "error" && (
             <>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Verification failed</h2>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">Invalid or expired verification link.</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("auth.verificationFailed")}</h2>
+              <p className="text-sm text-gray-500 dark:text-zinc-400">{t("auth.verificationFailedDesc")}</p>
               <Link to="/login" className="btn-primary w-full inline-block text-center">
-                Back to sign in
+                {t("auth.backToSignIn")}
               </Link>
             </>
           )}

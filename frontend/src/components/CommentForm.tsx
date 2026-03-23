@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { addComment } from "../api/tickets";
 import { useAuth } from "../contexts/AuthContext";
+import { useI18n } from "../contexts/I18nContext";
 import { Send } from "lucide-react";
 
 interface CommentFormProps {
@@ -10,6 +11,7 @@ interface CommentFormProps {
 
 export default function CommentForm({ ticketId, onCommentAdded }: CommentFormProps) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [content, setContent] = useState("");
   const [internal, setInternal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ export default function CommentForm({ ticketId, onCommentAdded }: CommentFormPro
       <textarea
         value={content}
         onChange={(event) => setContent(event.target.value)}
-        placeholder="Write a comment..."
+        placeholder={t("detail.writeComment")}
         rows={3}
         className="input-field resize-none"
       />
@@ -50,7 +52,7 @@ export default function CommentForm({ ticketId, onCommentAdded }: CommentFormPro
               onChange={(event) => setInternal(event.target.checked)}
               className="rounded border-gray-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500 dark:bg-zinc-800"
             />
-            Internal note
+            {t("detail.internalNote")}
           </label>
         ) : (
           <div />
@@ -58,7 +60,7 @@ export default function CommentForm({ ticketId, onCommentAdded }: CommentFormPro
 
         <button type="submit" disabled={loading || !content.trim()} className="btn-primary flex items-center gap-2 text-xs">
           <Send size={12} />
-          {loading ? "Sending..." : "Comment"}
+          {loading ? t("detail.sending") : t("detail.comment")}
         </button>
       </div>
     </form>

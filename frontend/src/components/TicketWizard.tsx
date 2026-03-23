@@ -3,6 +3,7 @@ import { createTicket } from "../api/tickets";
 import { getCategoryFields } from "../api/categories";
 import type { CustomFieldResponse } from "../api/categories";
 import { X, ArrowRight, ArrowLeft, Send, Loader2 } from "lucide-react";
+import { useI18n } from "../contexts/I18nContext";
 
 interface TicketWizardProps {
   category: { id: number; name: string; color: string };
@@ -10,14 +11,8 @@ interface TicketWizardProps {
   onCreated: () => void;
 }
 
-const priorities = [
-  { value: "LOW", label: "Low", description: "No rush", color: "border-sky-300 dark:border-sky-500/40 bg-sky-50 dark:bg-sky-500/5" },
-  { value: "MEDIUM", label: "Medium", description: "Normal", color: "border-blue-300 dark:border-blue-500/40 bg-blue-50 dark:bg-blue-500/5" },
-  { value: "HIGH", label: "High", description: "Important", color: "border-orange-300 dark:border-orange-500/40 bg-orange-50 dark:bg-orange-500/5" },
-  { value: "URGENT", label: "Urgent", description: "Critical", color: "border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/5" },
-];
-
 export default function TicketWizard({ category, onClose, onCreated }: TicketWizardProps) {
+  const { t } = useI18n();
   const [step, setStep] = useState(1);
   const [priority, setPriority] = useState("MEDIUM");
   const [title, setTitle] = useState("");
@@ -31,6 +26,13 @@ export default function TicketWizard({ category, onClose, onCreated }: TicketWiz
   const hasCustomFields = customFields.length > 0;
   const totalSteps = hasCustomFields ? 3 : 2;
   const detailsStep = hasCustomFields ? 3 : 2;
+
+  const priorities = [
+    { value: "LOW", label: t("wizard.low"), description: t("wizard.lowDesc"), color: "border-sky-300 dark:border-sky-500/40 bg-sky-50 dark:bg-sky-500/5" },
+    { value: "MEDIUM", label: t("wizard.medium"), description: t("wizard.mediumDesc"), color: "border-blue-300 dark:border-blue-500/40 bg-blue-50 dark:bg-blue-500/5" },
+    { value: "HIGH", label: t("wizard.high"), description: t("wizard.highDesc"), color: "border-orange-300 dark:border-orange-500/40 bg-orange-50 dark:bg-orange-500/5" },
+    { value: "URGENT", label: t("wizard.urgent"), description: t("wizard.urgentDesc"), color: "border-red-300 dark:border-red-500/40 bg-red-50 dark:bg-red-500/5" },
+  ];
 
   useEffect(() => {
     async function fetchFields() {
@@ -109,7 +111,7 @@ export default function TicketWizard({ category, onClose, onCreated }: TicketWiz
       <div className="card w-full max-w-lg mx-4 shadow-2xl dark:shadow-black/40">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">New Request</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">{t("wizard.newRequest")}</h3>
             <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: category.color || "#6366f1" }} />
               {category.name}
@@ -137,7 +139,7 @@ export default function TicketWizard({ category, onClose, onCreated }: TicketWiz
           ) : (
             <>
               {step === 1 && (
-                <StepPriority priority={priority} onPriorityChange={setPriority} onNext={handleNextFromPriority} />
+                <StepPriority priorities={priorities} priority={priority} onPriorityChange={setPriority} onNext={handleNextFromPriority} />
               )}
 
               {step === 2 && hasCustomFields && (
@@ -188,12 +190,21 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
   );
 }
 
-function StepPriority({ priority, onPriorityChange, onNext }: { priority: string; onPriorityChange: (v: string) => void; onNext: () => void }) {
+interface PriorityOption {
+  value: string;
+  label: string;
+  description: string;
+  color: string;
+}
+
+function StepPriority({ priorities, priority, onPriorityChange, onNext }: { priorities: PriorityOption[]; priority: string; onPriorityChange: (v: string) => void; onNext: () => void }) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">How urgent is this?</h4>
-        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">This helps us prioritize your request</p>
+        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">{t("wizard.howUrgent")}</h4>
+        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t("wizard.urgentHelp")}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -215,7 +226,7 @@ function StepPriority({ priority, onPriorityChange, onNext }: { priority: string
 
       <div className="flex justify-end pt-2">
         <button onClick={onNext} className="btn-primary flex items-center gap-2">
-          Next <ArrowRight size={14} />
+          {t("wizard.next")} <ArrowRight size={14} />
         </button>
       </div>
     </div>
@@ -229,11 +240,13 @@ function StepCustomFields({ fields, values, onChange, onBack, onNext }: {
   onBack: () => void;
   onNext: () => void;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">Additional details</h4>
-        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Fill in the fields below</p>
+        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">{t("wizard.additionalDetails")}</h4>
+        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t("wizard.fillFields")}</p>
       </div>
 
       <div className="space-y-3">
@@ -249,10 +262,10 @@ function StepCustomFields({ fields, values, onChange, onBack, onNext }: {
 
       <div className="flex justify-between pt-2">
         <button onClick={onBack} className="btn-secondary flex items-center gap-2">
-          <ArrowLeft size={14} /> Back
+          <ArrowLeft size={14} /> {t("wizard.back")}
         </button>
         <button onClick={onNext} className="btn-primary flex items-center gap-2">
-          Next <ArrowRight size={14} />
+          {t("wizard.next")} <ArrowRight size={14} />
         </button>
       </div>
     </div>
@@ -264,6 +277,8 @@ function CustomFieldInput({ field, value, onChange }: {
   value: string;
   onChange: (value: string) => void;
 }) {
+  const { t } = useI18n();
+
   const labelElement = (
     <label className="label">
       {field.label}
@@ -287,7 +302,7 @@ function CustomFieldInput({ field, value, onChange }: {
           onChange={(e) => onChange(e.target.value)}
           className="input-field"
         >
-          <option value="">Select...</option>
+          <option value="">{t("wizard.select")}</option>
           {parsedOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
@@ -319,42 +334,44 @@ function StepDetails({ title, description, onTitleChange, onDescriptionChange, o
   onTitleChange: (v: string) => void; onDescriptionChange: (v: string) => void;
   onBack: () => void; onSubmit: () => void; loading: boolean;
 }) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">Describe your issue</h4>
-        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">Be as specific as possible</p>
+        <h4 className="text-sm font-medium text-gray-900 dark:text-zinc-100">{t("wizard.describeIssue")}</h4>
+        <p className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{t("wizard.beSpecific")}</p>
       </div>
 
       <div>
-        <label className="label">Subject</label>
+        <label className="label">{t("wizard.subject")}</label>
         <input
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           className="input-field"
-          placeholder="Brief summary of the issue"
+          placeholder={t("wizard.subjectPlaceholder")}
           autoFocus
         />
       </div>
 
       <div>
-        <label className="label">Details</label>
+        <label className="label">{t("wizard.detailsLabel")}</label>
         <textarea
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={5}
           className="input-field resize-none"
-          placeholder="What happened? What did you expect? Any error messages?"
+          placeholder={t("wizard.detailsPlaceholder")}
         />
       </div>
 
       <div className="flex justify-between pt-2">
         <button onClick={onBack} className="btn-secondary flex items-center gap-2">
-          <ArrowLeft size={14} /> Back
+          <ArrowLeft size={14} /> {t("wizard.back")}
         </button>
         <button onClick={onSubmit} disabled={loading || !title.trim()} className="btn-primary flex items-center gap-2">
           <Send size={14} />
-          {loading ? "Submitting..." : "Submit Request"}
+          {loading ? t("wizard.submitting") : t("wizard.submitRequest")}
         </button>
       </div>
     </div>

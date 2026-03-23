@@ -3,6 +3,7 @@ import type { TicketResponse } from "../api/tickets";
 import { StatusBadge, PriorityBadge } from "./StatusBadge";
 import { getInitials } from "../utils";
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { useI18n } from "../contexts/I18nContext";
 
 interface TicketTableProps {
   tickets: TicketResponse[];
@@ -34,18 +35,19 @@ function SortableHeader({ field, label, sortBy, direction, onSort }: { field: st
 
 export default function TicketTable({ tickets, sortBy, direction, onSort }: TicketTableProps) {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   return (
     <div className="card overflow-hidden">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-gray-50 dark:bg-zinc-800/50 text-left text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-            <th className="px-4 py-3 font-medium w-16">#</th>
-            <th className="px-4 py-3 font-medium">Title</th>
-            <th className="px-4 py-3 font-medium">Status</th>
-            <SortableHeader field="priority" label="Priority" sortBy={sortBy} direction={direction} onSort={onSort} />
-            <th className="px-4 py-3 font-medium">Assignee</th>
-            <SortableHeader field="createdAt" label="Created" sortBy={sortBy} direction={direction} onSort={onSort} />
+            <th className="px-4 py-3 font-medium w-16">{t("tickets.id")}</th>
+            <th className="px-4 py-3 font-medium">{t("tickets.titleCol")}</th>
+            <th className="px-4 py-3 font-medium">{t("tickets.status")}</th>
+            <SortableHeader field="priority" label={t("tickets.priority")} sortBy={sortBy} direction={direction} onSort={onSort} />
+            <th className="px-4 py-3 font-medium">{t("tickets.assignee")}</th>
+            <SortableHeader field="createdAt" label={t("tickets.created")} sortBy={sortBy} direction={direction} onSort={onSort} />
           </tr>
         </thead>
         <tbody>
@@ -68,7 +70,7 @@ export default function TicketTable({ tickets, sortBy, direction, onSort }: Tick
                     <span className="text-gray-600 dark:text-zinc-400">{ticket.assigneeName}</span>
                   </div>
                 ) : (
-                  <span className="text-gray-400 dark:text-zinc-600">—</span>
+                  <span className="text-gray-400 dark:text-zinc-600">&mdash;</span>
                 )}
               </td>
               <td className="px-4 py-3 text-gray-500 dark:text-zinc-400 tabular-nums text-xs">
@@ -78,7 +80,7 @@ export default function TicketTable({ tickets, sortBy, direction, onSort }: Tick
           ))}
           {tickets.length === 0 && (
             <tr>
-              <td colSpan={6} className="px-4 py-12 text-center text-gray-400 dark:text-zinc-500">No tickets found</td>
+              <td colSpan={6} className="px-4 py-12 text-center text-gray-400 dark:text-zinc-500">{t("tickets.noTickets")}</td>
             </tr>
           )}
         </tbody>

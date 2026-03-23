@@ -5,8 +5,10 @@ import StatCard from "../components/StatCard";
 import PriorityChart from "../components/PriorityChart";
 import { getInitials } from "../utils";
 import { Inbox, AlertCircle, Clock, CheckCircle, Timer } from "lucide-react";
+import { useI18n } from "../contexts/I18nContext";
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [priorities, setPriorities] = useState<PriorityCount[]>([]);
   const [agents, setAgents] = useState<AgentStats[]>([]);
@@ -45,18 +47,18 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">Dashboard</h2>
-        <span className="text-xs text-gray-400 dark:text-zinc-500">Auto-refreshes every 30s</span>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100">{t("dashboard.title")}</h2>
+        <span className="text-xs text-gray-400 dark:text-zinc-500">{t("dashboard.autoRefresh")}</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <StatCard label="Total" value={stats.totalTickets} icon={<Inbox size={18} />} accent="text-gray-900 dark:text-zinc-100" />
-        <StatCard label="Open" value={stats.openTickets} icon={<AlertCircle size={18} />} accent="text-blue-600 dark:text-blue-400" />
-        <StatCard label="In Progress" value={stats.inProgressTickets} icon={<Clock size={18} />} accent="text-amber-600 dark:text-amber-400" />
-        <StatCard label="Resolved Today" value={stats.resolvedToday} icon={<CheckCircle size={18} />} accent="text-emerald-600 dark:text-emerald-400" />
+        <StatCard label={t("dashboard.total")} value={stats.totalTickets} icon={<Inbox size={18} />} accent="text-gray-900 dark:text-zinc-100" />
+        <StatCard label={t("dashboard.open")} value={stats.openTickets} icon={<AlertCircle size={18} />} accent="text-blue-600 dark:text-blue-400" />
+        <StatCard label={t("dashboard.inProgress")} value={stats.inProgressTickets} icon={<Clock size={18} />} accent="text-amber-600 dark:text-amber-400" />
+        <StatCard label={t("dashboard.resolvedToday")} value={stats.resolvedToday} icon={<CheckCircle size={18} />} accent="text-emerald-600 dark:text-emerald-400" />
         <StatCard
-          label="Avg Resolution"
-          value={stats.averageResolutionTimeHours !== null ? `${stats.averageResolutionTimeHours.toFixed(1)}h` : "—"}
+          label={t("dashboard.avgResolution")}
+          value={stats.averageResolutionTimeHours !== null ? `${stats.averageResolutionTimeHours.toFixed(1)}h` : "\u2014"}
           icon={<Timer size={18} />}
           accent="text-violet-600 dark:text-violet-400"
         />
@@ -66,15 +68,15 @@ export default function DashboardPage() {
         <PriorityChart data={priorities} />
 
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-4">Agent Workload</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-4">{t("dashboard.agentWorkload")}</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs font-medium text-gray-500 dark:text-zinc-400 uppercase tracking-wider">
-                  <th className="text-left pb-3">Agent</th>
-                  <th className="text-right pb-3">Assigned</th>
-                  <th className="text-right pb-3">Resolved</th>
-                  <th className="text-right pb-3">Rate</th>
+                  <th className="text-left pb-3">{t("dashboard.agent")}</th>
+                  <th className="text-right pb-3">{t("dashboard.assigned")}</th>
+                  <th className="text-right pb-3">{t("dashboard.resolved")}</th>
+                  <th className="text-right pb-3">{t("dashboard.rate")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -84,7 +86,7 @@ export default function DashboardPage() {
                 {agents.length === 0 && (
                   <tr>
                     <td colSpan={4} className="py-6 text-center text-gray-400 dark:text-zinc-500 text-sm">
-                      No agents assigned
+                      {t("dashboard.noAgents")}
                     </td>
                   </tr>
                 )}

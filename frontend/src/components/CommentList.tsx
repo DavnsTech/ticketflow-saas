@@ -1,8 +1,11 @@
 import type { CommentResponse } from "../api/tickets";
 import { getInitials } from "../utils";
 import { Lock } from "lucide-react";
+import { useI18n } from "../contexts/I18nContext";
 
 export default function CommentList({ comments }: { comments: CommentResponse[] }) {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-3">
       {comments.map((comment) => (
@@ -24,7 +27,7 @@ export default function CommentList({ comments }: { comments: CommentResponse[] 
             </span>
             {comment.internal && (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/10 px-1.5 py-0.5 rounded">
-                <Lock size={10} /> Internal
+                <Lock size={10} /> {t("detail.internal")}
               </span>
             )}
           </div>
@@ -32,7 +35,7 @@ export default function CommentList({ comments }: { comments: CommentResponse[] 
         </div>
       ))}
       {comments.length === 0 && (
-        <p className="text-sm text-gray-400 dark:text-zinc-500 text-center py-8">No comments yet</p>
+        <p className="text-sm text-gray-400 dark:text-zinc-500 text-center py-8">{t("detail.noComments")}</p>
       )}
     </div>
   );

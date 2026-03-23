@@ -10,7 +10,7 @@ interface AuthUser {
 
 interface AuthContextType {
   user: AuthUser | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, website?: string, captchaToken?: string, captchaAngle?: number) => Promise<void>;
   logout: () => void;
 }
 
@@ -27,8 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const response = await client.post("/auth/login", { email, password });
+  const login = useCallback(async (email: string, password: string, website?: string, captchaToken?: string, captchaAngle?: number) => {
+    const response = await client.post("/auth/login", { email, password, website, captchaToken, captchaAngle });
     const { accessToken, refreshToken, ...userData } = response.data;
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);

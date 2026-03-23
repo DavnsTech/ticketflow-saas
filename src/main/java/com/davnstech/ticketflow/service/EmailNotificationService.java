@@ -2,6 +2,7 @@ package com.davnstech.ticketflow.service;
 
 import com.davnstech.ticketflow.domain.Ticket;
 import com.davnstech.ticketflow.domain.TicketComment;
+import com.davnstech.ticketflow.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -65,6 +66,28 @@ public class EmailNotificationService {
         String recipient = comment.getTicket().getRequester().getEmail();
         String body = templateEngine.process("ticket-commented", context);
         sendEmail(recipient, "New comment on ticket #" + comment.getTicket().getId(), body);
+    }
+
+    @Async
+    public void sendVerificationEmail(User user) {
+        if (!enabled) return;
+
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("token", user.getVerificationToken());
+        String body = templateEngine.process("email-verification", context);
+        sendEmail(user.getEmail(), "Verify your email — TicketFlow", body);
+    }
+
+    @Async
+    public void sendPasswordResetEmail(User user) {
+        if (!enabled) return;
+
+        Context context = new Context();
+        context.setVariable("user", user);
+        context.setVariable("token", user.getResetToken());
+        String body = templateEngine.process("password-reset", context);
+        sendEmail(user.getEmail(), "Reset your password — TicketFlow", body);
     }
 
     private void sendEmail(String to, String subject, String htmlBody) {

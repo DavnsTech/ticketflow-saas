@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Zap, Sun, Moon } from "lucide-react";
+import HoneypotField from "../components/HoneypotField";
+import PuzzleCaptcha from "../components/PuzzleCaptcha";
 
 export default function LoginPage() {
   const { user, login } = useAuth();
@@ -10,8 +12,16 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [website, setWebsite] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaAngle, setCaptchaAngle] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleCaptchaSolved = useCallback((token: string, angle: number) => {
+    setCaptchaToken(token);
+    setCaptchaAngle(angle);
+  }, []);
 
   if (user) return <Navigate to="/dashboard" replace />;
 
@@ -21,7 +31,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, website, captchaToken, captchaAngle);
       navigate("/dashboard");
     } catch {
       setError("Invalid email or password");
@@ -59,6 +69,8 @@ export default function LoginPage() {
             </div>
           )}
 
+          <HoneypotField value={website} onChange={setWebsite} />
+
           <div>
             <label htmlFor="email" className="label">Email</label>
             <input
@@ -86,13 +98,20 @@ export default function LoginPage() {
             />
           </div>
 
+          <PuzzleCaptcha onSolved={handleCaptchaSolved} />
+
           <button type="submit" disabled={loading} className="btn-primary w-full">
             {loading ? "Signing in..." : "Sign in"}
           </button>
 
-          <p className="text-xs text-center text-gray-400 dark:text-zinc-500">
-            Demo: admin@ticketflow.local / password123
-          </p>
+          <div className="flex items-center justify-between text-xs">
+            <Link to="/forgot-password" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              Forgot password?
+            </Link>
+            <span className="text-gray-400 dark:text-zinc-500">
+              Demo: admin@ticketflow.local / password123
+            </span>
+          </div>
         </form>
       </div>
     </div>

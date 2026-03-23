@@ -33,6 +33,12 @@ ticketflow:
   email:
     enabled: false
     from: noreply@ticketflow.local
+  security:
+    login-rate-limit: 10
+    register-rate-limit: 5
+    forgot-password-rate-limit: 3
+    email-send-rate-limit: 3
+    account-creation-ip-limit: 3
 
 ---
 spring:

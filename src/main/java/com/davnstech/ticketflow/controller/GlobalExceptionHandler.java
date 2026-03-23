@@ -2,6 +2,7 @@ package com.davnstech.ticketflow.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.davnstech.ticketflow.exception.RateLimitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +16,11 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<Map<String, String>> handleRateLimit(RateLimitException exception) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(Map.of("error", exception.getMessage()));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException exception) {

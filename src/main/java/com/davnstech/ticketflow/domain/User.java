@@ -24,6 +24,18 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = true;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
+
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -55,6 +67,18 @@ public class User {
 
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public String getVerificationToken() { return verificationToken; }
+    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+
+    public String getResetToken() { return resetToken; }
+    public void setResetToken(String resetToken) { this.resetToken = resetToken; }
+
+    public LocalDateTime getResetTokenExpiry() { return resetTokenExpiry; }
+    public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) { this.resetTokenExpiry = resetTokenExpiry; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

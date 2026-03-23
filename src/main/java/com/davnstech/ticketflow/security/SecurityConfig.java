@@ -22,9 +22,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter, RateLimitFilter rateLimitFilter) {
         this.jwtFilter = jwtFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -34,9 +36,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/refresh").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/verify-email",
+                                "/api/captcha"
+                        ).permitAll()
                         .requestMatchers("/api/auth/register").hasRole("ADMIN")
                         .anyRequest().authenticated())
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
